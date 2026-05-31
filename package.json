@@ -1,0 +1,17 @@
+{
+  "name": "loud",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A verifiable privacy L3 on Base",
+  "scripts": {
+    "install": "pnpm install",
+    "setup": "pnpm --filter @loud/circuits build && pnpm --filter @loud/contracts compile",
+    "dev": "docker compose -f infra/op-stack/docker-compose.yml up -d && pnpm --filter @loud/web dev",
+    "test": "pnpm --filter @loud/circuits test && pnpm --filter @loud/sdk test && pnpm contracts:test",
+    "contracts:test": "pnpm --filter @loud/contracts test"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
