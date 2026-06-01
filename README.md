@@ -1,122 +1,94 @@
-# loud
+<p align="center">
+  <img src="banner.png" alt="Open Loud" width="600"/>
+</p>
 
-> **A verifiable privacy L3 on Base, built on the OP Stack.**
-> *Privacy you can verify. Loud by design.*
+<h1 align="center">Open Loud</h1>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Twitter](https://img.shields.io/twitter/follow/loudgg?style=social)](https://twitter.com/loudgg)
+<p align="center">
+  <b>A verifiable privacy L3 on Base, built on the OP Stack.</b><br/>
+  <i>Privacy you can verify. Loud by design.</i>
+</p>
+
+<p align="center">
+  X <a href="https://twitter.com/OpenLoudgg">@OpenLoudgg</a> · <a href="https://openloud.gg">openloud.gg</a>
+</p>
 
 ---
 
-## What is loud?
+A **verifiable privacy L3 on Base**, built on the OP Stack. Open Loud ships in two profiles that share one cryptographic core:
 
-**loud** is a privacy Layer 3 on Base that does something different: instead of hiding how it works, it makes its cryptography fully auditable and trustless.
+- **Full privacy chain** — every transfer is a shielded UTXO note (Circom + PLONK). No trusted setup. Fully verifiable.
+- **Open L3 + Privacy Pool** — a transparent EVM L3 with an opt-in, *compliance-compatible* Privacy Pool (fixed denomination + Association Sets, so withdrawals are "unlockable" by an Association Set Provider).
 
-Most privacy chains use **Groth16** — a proving system that requires a trusted setup ceremony. If that ceremony is compromised, the entire privacy guarantee collapses.
+It runs locally with a single sequencer via Docker Compose and deploys to Base Sepolia / mainnet by swapping the settlement endpoint and keys.
 
-**loud uses PLONK** — a universal, trustless proving system. No trusted setup. No ceremony. Anyone can verify everything.
+## Why PLONK, not Groth16?
+
+Most privacy chains use **Groth16** — a proving system that requires a trusted setup ceremony. If that ceremony is compromised, every privacy guarantee collapses.
+
+**Open Loud uses PLONK** — a universal, trustless proving system:
+
+| | Open Loud (PLONK) | Others (Groth16) |
+|--|---|---|
+| Trusted setup | ❌ None required | ✅ Required |
+| Ceremony risk | None | Single point of failure |
+| Auditability | Full — verify yourself | Partial |
+| Circuit upgrades | No new ceremony needed | New ceremony per circuit |
 
 > *If privacy is a right, the system protecting it should be open.*
-
----
-
-## Two modes, one core
-
-| Mode | Description |
-|------|-------------|
-| **Full Privacy Chain** | Every transfer is a shielded note (Circom + PLONK). Fully private. Fully verifiable. |
-| **Open L3 + Privacy Pool** | Transparent EVM with opt-in privacy. Compliance-compatible via Association Sets. |
-
----
-
-## Why loud vs other privacy L3s?
-
-| | loud | others |
-|--|------|--------|
-| Proving system | PLONK (trustless) | Groth16 (trusted setup) |
-| Setup ceremony | ❌ None required | ✅ Required |
-| Auditability | Full | Partial |
-| Base L3 | ✅ | ✅ |
-| Open source | ✅ | ✅ |
-
----
 
 ## Layout
 
 ```
 packages/
-  circuits/     Circom circuits + PLONK prover
+  circuits/     Circom circuits + PLONK prover (no trusted setup)
   contracts/    Hardhat: pools, verifiers, bridges
-  sdk/          TypeScript SDK for dApps
+  sdk/          TypeScript: notes, Merkle tree, proof generation
 infra/
-  op-stack/     Docker Compose: local L3 node
-  explorer/     Blockscout block explorer
+  op-stack/     Docker Compose single-sequencer L3
+  explorer/     Blockscout
 apps/
-  web/          Next.js wallet UI
+  web/          Next.js UI (deposit / withdraw / verify)
 docs/
-  architecture.md     System design & cryptographic core
-  workflow.md         Development phases & roadmap
+  workflow.md         phased build plan
+  architecture.md     system architecture & cryptographic core
   privacy-design.md   ZK circuit design & PLONK rationale
 ```
-
----
 
 ## Quick start
 
 ```bash
 pnpm install
-pnpm setup    # compile circuits & contracts
-pnpm dev      # start local stack
+pnpm setup    # compile circuits + deploy contracts
+pnpm dev      # local chain + deploy + wallet backend
 ```
 
-`pnpm dev` starts a local node, deploys the privacy core, copies circuit artifacts into the web app, and runs the wallet backend.
+`pnpm dev` is the turn-key local stack: it starts a local node, deploys the privacy core, copies circuit artifacts into the web app, and runs the wallet backend. Then:
 
-Run tests:
 ```bash
-pnpm --filter @loud/sdk test
-pnpm --filter @loud/circuits test
-pnpm contracts:test
+node apps/web/scripts/demo-deposit.mjs
+curl http://localhost:3000/api/pool/leaves
 ```
 
-Run full L3 with explorer (Docker):
+Run the full verification gate directly:
+
+```bash
+pnpm --filter @loud/sdk test        # 9/9 passing
+pnpm --filter @loud/circuits test   # 4/4 passing
+pnpm contracts:test                 # 10/10 passing
+```
+
+Real L3 + explorer (Docker; chain boot is optional — see each README):
+
 ```bash
 cd infra/op-stack && cp .env.example .env
 cd infra/explorer && cp .env.example .env
 docker compose up
 ```
 
----
+> Status: privacy core **done & verified**; full stack scaffolded & turn-key. See [docs/workflow.md](docs/workflow.md).
 
 ## Security
 
-> ⚠️ **loud is in active development. Do not use with real funds on mainnet yet.**
->
-> Unlike Groth16-based systems, loud's PLONK setup requires no trusted ceremony — but the codebase has not yet undergone a full external audit. Audit is planned for Phase 6. See [docs/workflow.md](docs/workflow.md).
+> ⚠️ The setup shipped for development is single-contributor and **must not** secure real funds. Mainnet requires an external audit (Phase 6). See [docs/privacy-design.md](docs/privacy-design.md).
 
----
-
-## Roadmap
-
-- [x] Phase 1 — PLONK circuit design (Circom)
-- [x] Phase 2 — Privacy Pool contracts (Hardhat)
-- [x] Phase 3 — SDK + prover integration
-- [ ] Phase 4 — OP Stack L3 deployment (Base Sepolia)
-- [ ] Phase 5 — Next.js wallet UI
-- [ ] Phase 6 — External audit
-- [ ] Phase 7 — Mainnet launch
-
-See [docs/workflow.md](docs/workflow.md) for full details.
-
----
-
-## Links
-
-- 🌐 Website: [loud.gg](https://loud.gg)
-- 🐦 Twitter: [@loudgg](https://twitter.com/loudgg)
-- 📄 Docs: [docs/](docs/)
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE)
