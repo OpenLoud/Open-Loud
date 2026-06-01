@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  X <a href="https://twitter.com/OpenLoudgg">@OpenLoudgg</a> · <a href="https://openloud.org">openloud.gg</a>
+  X <a href="https://twitter.com/OpenLoudgg">@OpenLoudgg</a> · <a href="https://openloud.org">openloud.org</a>
 </p>
 
 ---
