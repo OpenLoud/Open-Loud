@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build/
+artifacts/
+cache/
+*.ptau
+*.zkey
+pnpm-lock.yaml
